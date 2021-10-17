@@ -40,9 +40,8 @@ void fillMatrix(int n, int**& mat)
 
 void freeMatrix(int n, int** mat)
 {
-    for (int i = 0; i < n; i++)
-        delete[] mat[i];
-    delete[] mat;
+    free(mat[0]);
+    free(mat);
 }
 
 int** naive(int n, int** mat1, int** mat2)
