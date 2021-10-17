@@ -18,16 +18,24 @@ void print(int n, int** mat)
 
 int** allocateMatrix(int n)
 {
-    int** mat = (int**)malloc(n * sizeof(int*));
+    int* data = (int*)malloc(n * n * sizeof(int));
+    int** array = (int**)malloc(n * sizeof(int*));
     for (int i = 0; i < n; i++)
     {
-        mat[i] = (int*)malloc(n * sizeof(int));
+        array[i] = &(data[n * i]);
+    }
+    return array;
+}
+
+void fillMatrix(int n, int**& mat)
+{
+    for (int i = 0; i < n; i++)
+    {
         for (int j = 0; j < n; j++)
         {
             mat[i][j] = rand() % 5;
         }
     }
-    return mat;
 }
 
 void freeMatrix(int n, int** mat)
@@ -43,7 +51,7 @@ int** naive(int n, int** mat1, int** mat2)
 
     int i, j;
 
-    #pragma omp parallel for collapse(2)
+#pragma omp parallel for collapse(2)
     for (i = 0; i < n; i++)
     {
         for (j = 0; j < n; j++)
@@ -277,13 +285,16 @@ int main()
     cin >> n;
 
     int** mat1 = allocateMatrix(n);
+    fillMatrix(n, mat1);
+
     int** mat2 = allocateMatrix(n);
+    fillMatrix(n, mat2);
 
     double startParStrassen = omp_get_wtime();
     int** prod;
     #pragma omp parallel
     {
-        #pragma omp single
+    #pragma omp single
         {
             prod = strassen(n, mat1, mat2);
         }

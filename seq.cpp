@@ -18,23 +18,30 @@ void print(int n, int** mat)
 
 int** allocateMatrix(int n)
 {
-    int** mat = (int**)malloc(n * sizeof(int*));
+    int* data = (int*)malloc(n * n * sizeof(int));
+    int** array = (int**)malloc(n * sizeof(int*));
     for (int i = 0; i < n; i++)
     {
-        mat[i] = (int*)malloc(n * sizeof(int));
+        array[i] = &(data[n * i]);
+    }
+    return array;
+}
+
+void fillMatrix(int n, int**& mat)
+{
+    for (int i = 0; i < n; i++)
+    {
         for (int j = 0; j < n; j++)
         {
             mat[i][j] = rand() % 5;
         }
     }
-    return mat;
 }
 
 void freeMatrix(int n, int** mat)
 {
-    for (int i = 0; i < n; i++)
-        delete[] mat[i];
-    delete[] mat;
+    free(mat[0]);
+    free(mat);
 }
 
 int** naive(int n, int** mat1, int** mat2)
@@ -226,7 +233,10 @@ int main()
     cin >> n;
 
     int** mat1 = allocateMatrix(n);
+    fillMatrix(n, mat1);
+
     int** mat2 = allocateMatrix(n);
+    fillMatrix(n, mat2);
 
     double startSeqNaive = omp_get_wtime();
     int** prod1 = naive(n, mat1, mat2);
