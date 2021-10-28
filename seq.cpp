@@ -120,11 +120,9 @@ int** combineMatrices(int m, int** c11, int** c12, int** c21, int** c22)
 int** strassen(int n, int** mat1, int** mat2)
 {
 
-    if (n == 1)
+    if (n <= 32)
     {
-        int** prod = allocateMatrix(1);
-        prod[0][0] = mat1[0][0] * mat2[0][0];
-        return prod;
+        return naive(n, mat1, mat2);
     }
 
     int m = n / 2;

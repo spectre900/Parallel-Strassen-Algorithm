@@ -123,7 +123,7 @@ int** combineMatrices(int m, int** c11, int** c12, int** c21, int** c22)
 int** strassen(int n, int** mat1, int** mat2)
 {
 
-    if (n <= 512)
+    if (n <= 32)
     {
         return naive(n, mat1, mat2);
     }
