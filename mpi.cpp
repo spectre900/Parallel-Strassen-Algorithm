@@ -119,6 +119,100 @@ int** combineMatrices(int m, int** c11, int** c12, int** c21, int** c22)
     return result;
 }
 
+int** strassen(int n, int** mat1, int** mat2)
+{
+
+    if (n <= 32)
+    {
+        return naive(n, mat1, mat2);
+    }
+
+    int m = n / 2;
+
+    int** a = getSlice(n, mat1, 0, 0);
+    int** b = getSlice(n, mat1, 0, m);
+    int** c = getSlice(n, mat1, m, 0);
+    int** d = getSlice(n, mat1, m, m);
+    int** e = getSlice(n, mat2, 0, 0);
+    int** f = getSlice(n, mat2, 0, m);
+    int** g = getSlice(n, mat2, m, 0);
+    int** h = getSlice(n, mat2, m, m);
+
+    int** bds = addMatrices(m, b, d, false);
+    int** gha = addMatrices(m, g, h, true);
+    int** s1 = strassen(m, bds, gha);
+    freeMatrix(m, bds);
+    freeMatrix(m, gha);
+
+    int** ada = addMatrices(m, a, d, true);
+    int** eha = addMatrices(m, e, h, true);
+    int** s2 = strassen(m, ada, eha);
+    freeMatrix(m, ada);
+    freeMatrix(m, eha);
+
+    int** acs = addMatrices(m, a, c, false);
+    int** efa = addMatrices(m, e, f, true);
+    int** s3 = strassen(m, acs, efa);
+    freeMatrix(m, acs);
+    freeMatrix(m, efa);
+
+    int** aba = addMatrices(m, a, b, true);
+    int** s4 = strassen(m, aba, h);
+    freeMatrix(m, aba);
+    freeMatrix(m, b);
+
+    int** fhs = addMatrices(m, f, h, false);
+    int** s5 = strassen(m, a, fhs);
+    freeMatrix(m, fhs);
+    freeMatrix(m, a);
+    freeMatrix(m, f);
+    freeMatrix(m, h);
+
+    int** ges = addMatrices(m, g, e, false);
+    int** s6 = strassen(m, d, ges);
+    freeMatrix(m, ges);
+    freeMatrix(m, g);
+
+    int** cda = addMatrices(m, c, d, true);
+    int** s7 = strassen(m, cda, e);
+    freeMatrix(m, cda);
+    freeMatrix(m, c);
+    freeMatrix(m, d);
+    freeMatrix(m, e);
+
+    int** s1s2a = addMatrices(m, s1, s2, true);
+    int** s6s4s = addMatrices(m, s6, s4, false);
+    int** c11 = addMatrices(m, s1s2a, s6s4s, true);
+    freeMatrix(m, s1s2a);
+    freeMatrix(m, s6s4s);
+    freeMatrix(m, s1);
+
+    int** c12 = addMatrices(m, s4, s5, true);
+    freeMatrix(m, s4);
+
+    int** c21 = addMatrices(m, s6, s7, true);
+    freeMatrix(m, s6);
+
+    int** s2s3s = addMatrices(m, s2, s3, false);
+    int** s5s7s = addMatrices(m, s5, s7, false);
+    int** c22 = addMatrices(m, s2s3s, s5s7s, true);
+    freeMatrix(m, s2s3s);
+    freeMatrix(m, s5s7s);
+    freeMatrix(m, s2);
+    freeMatrix(m, s3);
+    freeMatrix(m, s5);
+    freeMatrix(m, s7);
+
+    int** prod = combineMatrices(m, c11, c12, c21, c22);
+
+    freeMatrix(m, c11);
+    freeMatrix(m, c12);
+    freeMatrix(m, c21);
+    freeMatrix(m, c22);
+
+    return prod;
+}
+
 void strassen(int n, int** mat1, int** mat2, int**& prod, int rank)
 {
 
@@ -162,7 +256,7 @@ void strassen(int n, int** mat1, int** mat2, int**& prod, int rank)
     {
         int** bds = addMatrices(m, b, d, false);
         int** gha = addMatrices(m, g, h, true);
-        s1 = naive(m, bds, gha);
+        s1 = strassen(m, bds, gha);
         freeMatrix(m, bds);
         freeMatrix(m, gha);
         MPI_Send(&(s1[0][0]), m * m, MPI_INT, 0, 0, MPI_COMM_WORLD);
@@ -172,7 +266,7 @@ void strassen(int n, int** mat1, int** mat2, int**& prod, int rank)
     {
         int** ada = addMatrices(m, a, d, true);
         int** eha = addMatrices(m, e, h, true);
-        s2 = naive(m, ada, eha);
+        s2 = strassen(m, ada, eha);
         freeMatrix(m, ada);
         freeMatrix(m, eha);
         MPI_Send(&(s2[0][0]), m * m, MPI_INT, 0, 0, MPI_COMM_WORLD);
@@ -182,7 +276,7 @@ void strassen(int n, int** mat1, int** mat2, int**& prod, int rank)
     {
         int** acs = addMatrices(m, a, c, false);
         int** efa = addMatrices(m, e, f, true);
-        s3 = naive(m, acs, efa);
+        s3 = strassen(m, acs, efa);
         freeMatrix(m, acs);
         freeMatrix(m, efa);
         MPI_Send(&(s3[0][0]), m * m, MPI_INT, 0, 0, MPI_COMM_WORLD);
@@ -191,7 +285,7 @@ void strassen(int n, int** mat1, int** mat2, int**& prod, int rank)
     if (rank == 4)
     {
         int** aba = addMatrices(m, a, b, true);
-        s4 = naive(m, aba, h);
+        s4 = strassen(m, aba, h);
         freeMatrix(m, aba);
         MPI_Send(&(s4[0][0]), m * m, MPI_INT, 0, 0, MPI_COMM_WORLD);
     }
@@ -200,7 +294,7 @@ void strassen(int n, int** mat1, int** mat2, int**& prod, int rank)
     if (rank == 5)
     {
         int** fhs = addMatrices(m, f, h, false);
-        s5 = naive(m, a, fhs);
+        s5 = strassen(m, a, fhs);
         freeMatrix(m, fhs);
         MPI_Send(&(s5[0][0]), m * m, MPI_INT, 0, 0, MPI_COMM_WORLD);
     }
@@ -211,7 +305,7 @@ void strassen(int n, int** mat1, int** mat2, int**& prod, int rank)
     if (rank == 6)
     {
         int** ges = addMatrices(m, g, e, false);
-        s6 = naive(m, d, ges);
+        s6 = strassen(m, d, ges);
         freeMatrix(m, ges);
         MPI_Send(&(s6[0][0]), m * m, MPI_INT, 0, 0, MPI_COMM_WORLD);
     }
@@ -220,7 +314,7 @@ void strassen(int n, int** mat1, int** mat2, int**& prod, int rank)
     if (rank == 7)
     {
         int** cda = addMatrices(m, c, d, true);
-        s7 = naive(m, cda, e);
+        s7 = strassen(m, cda, e);
         freeMatrix(m, cda);
         MPI_Send(&(s7[0][0]), m * m, MPI_INT, 0, 0, MPI_COMM_WORLD);
     }
