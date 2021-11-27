@@ -291,6 +291,9 @@ int main()
 
     double startParStrassen = omp_get_wtime();
     int** prod;
+
+    omp_set_num_threads(8);
+
     #pragma omp parallel
     {
     #pragma omp single
