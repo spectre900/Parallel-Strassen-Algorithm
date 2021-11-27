@@ -1,4 +1,3 @@
-#include <omp.h>
 #include <bits/stdc++.h>
 
 using namespace std;
@@ -236,17 +235,18 @@ int main()
     int** mat2 = allocateMatrix(n);
     fillMatrix(n, mat2);
 
-    double startSeqNaive = omp_get_wtime();
+    clock_t start, end;
+    start = clock();
     int** prod1 = naive(n, mat1, mat2);
-    double endSeqNaive = omp_get_wtime();
-    cout << "\nSequential Naive Runtime: ";
-    cout << setprecision(5) << endSeqNaive - startSeqNaive << endl;
+    end = clock();
+    double time = double(end - start) / double(CLOCKS_PER_SEC);
+    cout << "\nSequential Naive Runtime: " << time << " seconds\n";
 
-    double startSeqStrassen = omp_get_wtime();
+    start = clock();
     int** prod2 = strassen(n, mat1, mat2);
-    double endSeqStrassen = omp_get_wtime();
-    cout << "\nSequential Strassen Runtime: ";
-    cout << setprecision(5) << endSeqStrassen - startSeqStrassen << endl;
+    end = clock();
+    time = double(end - start) / double(CLOCKS_PER_SEC);
+    cout << "\nSequential Strassen Runtime: " << time << " seconds\n";
 
     cout << endl;
 

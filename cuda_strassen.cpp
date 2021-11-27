@@ -321,7 +321,7 @@ int main()
 
     end = clock();
     double time = double(end - start) / double(CLOCKS_PER_SEC);
-    cout<<"Runtime: "<<time<<" seconds\n";
+    cout<<"Parallel Strassen Runtime (CUDA): "<<time<<" seconds\n";
 
     return 0;
 }

@@ -302,7 +302,7 @@ int main()
         }
     }
     double endParStrassen = omp_get_wtime();
-    cout << "\nParallel Strassen Runtime: ";
+    cout << "\nParallel Strassen Runtime (OMP): ";
     cout << setprecision(5) << endParStrassen - startParStrassen << endl;
 
     cout << endl;

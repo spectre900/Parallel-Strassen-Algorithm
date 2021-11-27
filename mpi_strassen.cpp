@@ -1,4 +1,3 @@
-#include <omp.h>
 #include <mpi.h>
 #include <bits/stdc++.h>
 
@@ -417,9 +416,9 @@ int main(int argc, char* argv[])
 
     if (p_rank == 0)
     {
-        cout << "\nParallel Strassen Runtime(MPI): ";
+        cout << "\nParallel Strassen Runtime (MPI): ";
         cout << setprecision(5) << endTime - startTime << endl;
-        cout << endl << endl;
+        cout << endl;
     }
 
     MPI_Finalize();

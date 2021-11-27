@@ -92,7 +92,7 @@ int main()
 
     end = clock();
     double time = double(end - start) / double(CLOCKS_PER_SEC);
-    cout << "Runtime: " << time << " seconds\n";
+    cout << "Parallel Naive Runtime (CUDA): " << time << " seconds\n";
 
     cudaMemcpy(h_product, d_product, bytes, cudaMemcpyDeviceToHost);
 
